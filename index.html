@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aurora Presupuesto</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#07090b">
+<meta name="description" content="App Android de presupuesto personal para Venezuela. Bolívares y dólares, tasa del día guardada en cada movimiento, funciona sin internet.">
+<meta property="og:title" content="Aurora Presupuesto — Tu plata, bajo control">
+<meta property="og:description" content="Gastos, cuentas, deudas y metas en bolívares y dólares. Sin cuenta, sin servidor, sin internet.">
+<meta property="og:image" content="assets/logo.png">
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Concepto: la misma landing oscura y platinada de Aurora Negocio, con las pantallas reales de Presupuesto dibujadas en CSS. */
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+color-scheme:dark;
+--bg:#07090b;--s1:#0c1014;--s2:#11161b;--s3:#161c22;
+--tx:#eef1f4;--soft:#98a3ae;--dim:#6b7681;
+--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);
+--g:#2fc974;--g2:#1b9e52;--gd:#0f6b37;--amb:#f2b544;--red:#f2705f;--cy:#38bdf8;
+--plat:linear-gradient(180deg,#ffffff 0%,#dfe5ea 45%,#9aa6b2 100%);
+--ease:cubic-bezier(.2,.7,.2,1);
+/* colores de la app, modo oscuro (marca.py) */
+--a-bg:#0f1318;--a-card:#171c24;--a-card2:#212832;--a-tx:#f2f5f9;--a-soft:#a7b3c2;--a-line:#2b3441;
+--mac:#1b9e52;--mac2:#25b567}
+html{scroll-padding-top:84px;scroll-behavior:smooth;height:auto;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Montserrat,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:400;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body:before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+img{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--g);outline-offset:3px;border-radius:8px}
+.w{max-width:1080px;margin:auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Navegación ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;transition:background .3s,border-color .3s,backdrop-filter .3s;border-bottom:1px solid transparent}
+.top.on{background:rgba(7,9,11,.72);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);border-color:var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:600;font-size:13px;letter-spacing:.32em}
+.brand img{width:38px;height:38px;border-radius:50%;box-shadow:0 0 0 1px var(--line2),0 6px 20px rgba(0,0,0,.5)}
+.links{display:flex;align-items:center;gap:30px}
+.links a{color:var(--soft);font-size:13.5px;font-weight:500;text-decoration:none;transition:color .2s}
+.links a:hover{color:var(--tx)}
+.links a.pill{color:var(--tx);border:1px solid var(--line2);border-radius:99px;padding:9px 20px;background:rgba(255,255,255,.03);transition:border-color .25s,background .25s}
+.links a.pill:hover{border-color:var(--g);background:rgba(47,201,116,.08)}
+@media(max-width:640px){.links a:not(.pill){display:none}.brand{letter-spacing:.14em;font-size:12px}}
+
+/* ---------- Hero ---------- */
+.hero-bg{position:relative;overflow:hidden;margin-top:-72px;padding-top:72px;
+background:radial-gradient(760px 520px at 82% 18%,rgba(47,201,116,.16),transparent 70%),radial-gradient(600px 400px at 8% 70%,rgba(154,166,178,.07),transparent 70%)}
+.hero{position:relative;display:grid;gap:44px;align-items:center;padding:56px 0 96px}
+@media(min-width:860px){.hero{grid-template-columns:1.12fr .88fr;padding:84px 0 120px}}
+.hero>div{min-width:0}
+.eyebrow{display:inline-flex;gap:10px;align-items:center;border:1px solid var(--line2);color:var(--tx);border-radius:99px;padding:7px 16px 7px 12px;font-size:12.5px;font-weight:500;background:rgba(255,255,255,.03)}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 0 4px rgba(47,201,116,.18),0 0 14px var(--g)}
+h1,h2,h3{font-weight:600;margin:0;text-wrap:balance}
+h1{font-size:clamp(36px,6.4vw,66px);line-height:1.04;letter-spacing:-.03em;margin:26px 0 24px;background:var(--plat);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-bottom:.08em}
+h1 b{display:block;font-weight:300}
+.lead{color:#b4bec9;font-size:clamp(16px,2.2vw,18.5px);max-width:30em;margin:0;font-weight:400;line-height:1.75}
+.btns{display:flex;flex-wrap:wrap;gap:14px;margin:36px 0 34px}
+.btn{position:relative;display:inline-flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.01em;padding:16px 30px;border-radius:99px;border:0;cursor:pointer;font-family:inherit;
+background:linear-gradient(180deg,#34d27c 0%,var(--g2) 100%);
+box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 0 rgba(0,0,0,.4),0 14px 36px -8px rgba(47,201,116,.55);
+transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.btn:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 1px 0 rgba(0,0,0,.4),0 20px 44px -8px rgba(47,201,116,.7)}
+.btn:active{transform:translateY(0)}
+.btn.o{background:rgba(255,255,255,.03);border:1px solid var(--line2);box-shadow:none;color:var(--tx)}
+.btn.o:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.07);box-shadow:none}
+.pills{display:flex;flex-wrap:wrap;gap:10px 22px;padding:0;margin:0;list-style:none}
+.pills li{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--soft)}
+.pills svg{width:17px;height:17px;stroke:#c9d1d9;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.stage{position:relative;display:flex;justify-content:center;align-items:center;min-height:500px}
+.emblem{position:absolute;width:min(560px,125%);aspect-ratio:1;border-radius:50%;object-fit:cover;opacity:.22;mix-blend-mode:screen;animation:spin 140s linear infinite;
+-webkit-mask-image:radial-gradient(circle,#000 52%,transparent 71%);mask-image:radial-gradient(circle,#000 52%,transparent 71%);pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stage .frame{position:relative;width:min(74vw,316px)}
+.stage .frame:before{content:"";position:absolute;inset:8% -14% -6%;background:radial-gradient(closest-side,rgba(47,201,116,.38),transparent);filter:blur(34px);z-index:-1}
+
+/* marco con filo platino */
+.frame{container-type:inline-size;padding:1px;border-radius:28px;background:linear-gradient(155deg,rgba(255,255,255,.55),rgba(255,255,255,.05) 38%,rgba(255,255,255,.04) 62%,rgba(255,255,255,.28));box-shadow:0 40px 80px -24px rgba(0,0,0,.85)}
+
+.in{opacity:0;transform:translateY(16px);animation:rise .9s var(--ease) forwards}
+.in:nth-child(1){animation-delay:.05s}.in:nth-child(2){animation-delay:.16s}.in:nth-child(3){animation-delay:.27s}.in:nth-child(4){animation-delay:.38s}.in:nth-child(5){animation-delay:.49s}
+.stage{opacity:0;animation:rise 1.1s .25s var(--ease) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* ---------- Secciones ---------- */
+.sec{padding:110px 0}
+.alt{background:linear-gradient(180deg,var(--s1),var(--bg));border-top:1px solid var(--line)}
+h2{font-size:clamp(28px,4.4vw,44px);line-height:1.12;letter-spacing:-.025em;background:var(--plat);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-bottom:.08em}
+h2 b{font-weight:300}
+.sub{color:var(--soft);margin:16px 0 0;max-width:34em;font-size:16px}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+.head{margin-bottom:56px}
+.note{color:var(--dim);font-size:12.5px;margin:6px 0 0}
+
+/* galería */
+.gal{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px max(24px,env(safe-area-inset-left,0px)) 34px;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:flex-start}
+.gal::-webkit-scrollbar{display:none}
+@media(min-width:1100px){.gal{justify-content:center}}
+.gal .cap{flex:none;scroll-snap-align:center;width:248px}
+.gal .frame{width:248px;transition:transform .5s var(--ease)}
+.gal .cap:hover .frame{transform:translateY(-8px)}
+.cap p{margin:18px 4px 0;text-align:center;font-size:13px;color:var(--soft);font-weight:500}
+.swatch-row{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:center;justify-content:center;margin-top:8px}
+.swatch-row span{font-size:13px;color:var(--soft);margin-right:6px}
+.sw{width:30px;height:30px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--c);box-shadow:0 0 0 1px var(--line2),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .2s var(--ease),box-shadow .2s}
+.sw:hover{transform:scale(1.12)}
+.sw[aria-pressed=true]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--c)}
+
+/* funciones */
+.feat{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:26px;overflow:hidden;grid-template-columns:1fr}
+@media(min-width:560px){.feat{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:980px){.feat{grid-template-columns:repeat(4,1fr)}}
+.cell{position:relative;background:var(--s1);padding:34px 28px 36px;transition:background .35s;min-width:0}
+.cell:hover{background:var(--s2)}
+.cell svg{width:30px;height:30px;stroke:#d5dbe1;fill:none;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round;margin-bottom:26px;display:block}
+.cell h3{font-size:17px;margin:0 0 8px;letter-spacing:-.01em}
+.cell p{margin:0;color:var(--soft);font-size:14.5px;line-height:1.6}
+.cell.hot{background:radial-gradient(300px 220px at 0 0,rgba(47,201,116,.14),transparent 75%),var(--s1)}
+.cell.hot svg{stroke:var(--g)}
+
+/* dos columnas */
+.split{display:grid;gap:56px;align-items:center}
+@media(min-width:860px){.split{grid-template-columns:1.05fr .95fr}.split.rev{grid-template-columns:.95fr 1.05fr}.split.rev>:first-child{order:2}}
+.split>*{min-width:0}
+.split h2{max-width:11em}
+.split .frame{width:min(86vw,380px);justify-self:center}
+.ok{list-style:none;padding:0;margin:34px 0 0;display:grid;gap:0}
+.ok li{padding:18px 0 18px 42px;position:relative;border-top:1px solid var(--line);color:#c4ccd5;font-size:15px}
+.ok li:last-child{border-bottom:1px solid var(--line)}
+.ok li b{color:var(--tx);font-weight:600}
+.ok li:before{content:"✓";position:absolute;left:0;top:18px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(47,201,116,.45);background:rgba(47,201,116,.1);color:var(--g);font-weight:700;font-size:12px;display:grid;place-items:center}
+.firma{margin:28px 0 0;color:var(--dim);font-size:13.5px;letter-spacing:.02em}
+
+/* tasa guardada: comparación */
+.ledger{border:1px solid var(--line2);border-radius:26px;background:linear-gradient(180deg,var(--s2),var(--s1));padding:30px 28px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+.ledger .row{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:14px 0;border-top:1px solid var(--line);font-size:14.5px;color:var(--soft)}
+.ledger .row:first-of-type{border-top:0}
+.ledger .row b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.ledger .tit{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.ledger .tit span{font-size:12.5px;color:var(--soft);letter-spacing:.04em}
+.chips{display:flex;gap:6px}
+.chips i{font-style:normal;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--line2);color:var(--soft)}
+.chips i.on{border-color:rgba(47,201,116,.55);color:var(--g);background:rgba(47,201,116,.1)}
+.ledger .fijo{margin-top:12px;padding:18px 18px;border-radius:18px;background:rgba(47,201,116,.08);border:1px solid rgba(47,201,116,.3);display:flex;justify-content:space-between;gap:12px;align-items:center}
+.ledger .fijo small{display:block;color:var(--soft);font-size:12.5px;line-height:1.4}
+.ledger .fijo b{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ledger s{color:var(--dim)}
+
+/* fórmula */
+.calc{display:grid;gap:10px;grid-template-columns:1fr;max-width:980px;margin:auto;align-items:stretch}
+@media(min-width:900px){.calc{grid-template-columns:repeat(4,1fr) auto 1.15fr;gap:8px}}
+.calc>div{min-width:0}
+.op{display:grid;place-items:center;color:var(--dim);font-size:22px;font-weight:300}
+.tile{background:var(--s1);border:1px solid var(--line);border-radius:20px;padding:22px 20px}
+.tile small{display:block;color:var(--soft);font-size:12.5px;line-height:1.35;min-height:2.7em}
+.tile b{display:block;margin-top:10px;font-size:26px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tile.res{border-color:transparent;background:linear-gradient(var(--s2),var(--s2)) padding-box,linear-gradient(160deg,#fff,rgba(47,201,116,.9) 40%,rgba(255,255,255,.12) 75%,#aab4bf) border-box;border:1.5px solid transparent;box-shadow:0 30px 70px -26px rgba(47,201,116,.45)}
+.tile.res b{font-size:34px;background:var(--plat);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.calc-note{text-align:center;color:var(--dim);font-size:13px;margin:26px 0 0}
+
+/* pasos */
+.steps{max-width:660px;margin:auto;position:relative;display:grid;gap:18px;counter-reset:s}
+.steps:before{content:"";position:absolute;left:25px;top:30px;bottom:30px;width:1px;background:linear-gradient(var(--line2),var(--line2) 70%,transparent)}
+.step{position:relative;display:flex;gap:22px;align-items:flex-start;padding:4px 0}
+.step:before{counter-increment:s;content:counter(s);flex:none;width:51px;height:51px;border-radius:50%;background:var(--bg);border:1px solid var(--line2);font-weight:500;font-size:17px;display:grid;place-items:center;position:relative;z-index:1;color:var(--tx);box-shadow:0 0 0 6px var(--bg)}
+.step:last-child:before{border-color:rgba(47,201,116,.6);color:var(--g);background:rgba(47,201,116,.08)}
+.step b{display:block;font-size:18px;font-weight:600;margin:10px 0 4px;letter-spacing:-.01em}
+.step span{color:var(--soft);font-size:15px;display:block}
+
+/* preguntas */
+.faq{max-width:760px;margin:auto}
+details{border-top:1px solid var(--line);padding:0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:500;font-size:16.5px;padding:24px 44px 24px 2px;list-style:none;position:relative;transition:color .2s}
+summary::-webkit-details-marker{display:none}
+summary:hover{color:#fff}
+summary:after{content:"";position:absolute;right:4px;top:50%;width:11px;height:11px;margin-top:-8px;border-right:1.5px solid var(--soft);border-bottom:1.5px solid var(--soft);transform:rotate(45deg);transition:transform .3s var(--ease),border-color .3s}
+details[open] summary:after{transform:rotate(225deg);margin-top:-3px;border-color:var(--g)}
+details p{color:var(--soft);margin:0;padding:0 44px 26px 2px;font-size:15px}
+
+/* cierre */
+.cta{position:relative;overflow:hidden;border-radius:34px;padding:78px 24px 70px;text-align:center;border:1px solid var(--line2);
+background:radial-gradient(560px 300px at 50% 0,rgba(47,201,116,.26),transparent 72%),linear-gradient(180deg,var(--s2),var(--s1))}
+.cta .logo{width:92px;height:92px;border-radius:50%;margin:0 auto 26px;display:block;box-shadow:0 0 0 1px var(--line2),0 0 0 9px rgba(255,255,255,.03),0 18px 50px rgba(0,0,0,.6)}
+.cta p{color:#b4bec9;margin:14px 0 0}
+.cta .btn{margin-top:34px;font-size:16px;padding:18px 38px}
+.cta .wa{font-size:14px;margin-top:34px}
+.cta .wa a{color:var(--g);font-weight:600;text-underline-offset:4px}
+#msg{font-size:13.5px;margin-top:16px;color:var(--amb);min-height:1.2em}
+footer{padding:44px 0 56px;color:var(--dim);font-size:13px;text-align:center;border-top:1px solid var(--line);line-height:1.9}
+
+/* ================= Pantallas de la app (colores de marca.py) ================= */
+.scr{font-size:4.1cqw;aspect-ratio:9/18;background:var(--a-bg);color:var(--a-tx);border-radius:27px;position:relative;overflow:hidden;padding:.7em 1em 1em;display:flex;flex-direction:column;gap:.75em;line-height:1.35;font-weight:500;user-select:none}
+.scr *{min-width:0}
+.sb{display:flex;justify-content:space-between;align-items:center;font-size:.8em;color:var(--a-soft);font-weight:600;padding:0 .4em}
+.sb i{width:1.7em;height:.8em;border:1.5px solid var(--a-soft);border-radius:.25em;position:relative}
+.sb i:after{content:"";position:absolute;inset:1.5px;right:35%;background:var(--a-soft);border-radius:.1em}
+.ah{display:flex;align-items:center;justify-content:space-between;gap:.6em}
+.ah svg,.ph svg{width:1.55em;height:1.55em;stroke:var(--a-soft);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ah b,.ph b{font-size:1.15em;font-weight:700}
+.ph{display:flex;align-items:center;gap:.6em}
+.tg{display:flex;background:var(--a-card2);border-radius:99px;padding:.2em}
+.tg button{font:inherit;font-size:.85em;font-weight:700;color:var(--a-soft);background:none;border:0;border-radius:99px;padding:.3em .85em;cursor:pointer;min-height:1.9em}
+.tg button.on{background:var(--mac);color:#fff}
+.per{display:flex;gap:.35em;font-size:.82em;font-weight:600}
+.per span{padding:.35em .8em;border-radius:99px;background:var(--a-card);color:var(--a-soft)}
+.per span.on{background:var(--mac);color:#fff}
+.donut{position:relative;width:56%;margin:0 auto}
+.donut svg{display:block;width:100%;transform:rotate(-90deg)}
+.donut svg circle{fill:none;stroke-width:12}
+.donut div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.donut small{font-size:.74em;color:var(--a-soft);font-weight:600}
+.donut b{font-size:1.3em;font-weight:700;font-variant-numeric:tabular-nums}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.55em}
+.cd{background:var(--a-card);border-radius:.95em;padding:.7em .85em}
+.cd small{display:block;font-size:.78em;color:var(--a-soft);font-weight:600}
+.cd b{font-weight:700;font-variant-numeric:tabular-nums}
+.pos{color:var(--mac2)}.neg{color:var(--red)}.amb{color:var(--amb)}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:.25em .9em;font-size:.8em;color:var(--a-soft);padding:0 .2em}
+.leg span{display:flex;align-items:center;gap:.5em;white-space:nowrap}
+.leg span:before{content:"";width:.7em;height:.7em;border-radius:50%;background:var(--c);flex:none}
+.leg em{margin-left:auto;font-style:normal;color:var(--a-tx);font-weight:600}
+.disp{display:flex;flex-direction:column;gap:.15em}
+.disp .t{display:flex;align-items:center;gap:.5em;font-size:.82em;color:var(--a-soft);font-weight:600}
+.disp .t svg{width:1.4em;height:1.4em;stroke:var(--mac2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.disp b{font-size:1.6em;font-weight:700;font-variant-numeric:tabular-nums}
+.disp small{font-size:.74em;color:var(--a-soft);font-weight:500}
+.dock{margin-top:auto;display:flex;gap:.6em;align-items:center}
+.dock .p4{flex:1;display:flex;justify-content:space-around;align-items:center;height:3.5em;border-radius:99px;background:var(--a-card);border:1px solid var(--a-line);box-shadow:0 8px 24px -8px rgba(0,0,0,.5)}
+.dock svg{width:1.55em;height:1.55em;stroke:var(--a-soft);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nuevo,.fab{display:flex;align-items:center;gap:.4em;height:3.5em;padding:0 1.25em;border-radius:99px;background:var(--mac);color:#fff;font-weight:700;font-size:1em;box-shadow:0 8px 20px -6px var(--mac)}
+.nuevo svg,.fab svg{width:1.3em;height:1.3em;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+.fab{justify-content:center;margin-top:auto}
+.it{display:flex;flex-direction:column;gap:.45em}
+.it .r{display:flex;justify-content:space-between;gap:.6em;align-items:baseline;font-size:.92em}
+.it .r b{font-variant-numeric:tabular-nums;font-size:.95em}
+.it .r small{color:var(--a-soft);font-weight:500;font-size:.85em}
+.bar{height:.5em;border-radius:99px;background:var(--a-card2);overflow:hidden}
+.bar i{display:block;height:100%;width:var(--p);background:var(--mac2);border-radius:inherit}
+.bar.bw i{background:var(--amb)}.bar.br i{background:var(--red)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--a-card);border-radius:99px;padding:.25em;font-size:.88em;font-weight:700;text-align:center}
+.tabs span{padding:.5em;border-radius:99px;color:var(--a-soft)}
+.tabs span.on{background:var(--mac);color:#fff}
+.cli{display:flex;flex-direction:column;gap:.55em}
+.cli .top2{display:flex;justify-content:space-between;gap:.5em;align-items:baseline}
+.cli b{font-weight:700}
+.cli small{color:var(--a-soft);font-size:.78em;font-weight:500}
+.wa-b{align-self:flex-start;font-size:.78em;font-weight:700;color:var(--mac2);border:1px solid var(--a-line);border-radius:99px;padding:.3em .9em;display:inline-flex;align-items:center;gap:.4em}
+.wa-b:before{content:"";width:.6em;height:.6em;border-radius:50%;background:var(--mac2)}
+.cols{display:flex;align-items:flex-end;gap:.7em;height:9.5em;padding:.4em .3em 0}
+.cols div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:.35em;height:100%;font-size:.74em;color:var(--a-soft);font-weight:600}
+.cols div i{display:block;width:100%;height:var(--h);background:var(--a-line);border-radius:.45em .45em .15em .15em}
+.cols div.cur i{background:var(--mac)}
+.cols div em{font-style:normal;color:var(--a-tx);font-variant-numeric:tabular-nums}
+.btn2{display:grid;grid-template-columns:repeat(3,1fr);gap:.45em;font-size:.82em;font-weight:700;text-align:center}
+.btn2 span{background:var(--a-card2);border-radius:.8em;padding:.6em 0}
+/* asistente */
+.inp{background:var(--a-card);border:1px solid var(--a-line);border-radius:.95em;padding:.8em .95em;min-height:3.6em;font-size:.95em}
+.go{background:var(--mac);color:#fff;text-align:center;border-radius:99px;padding:.7em;font-weight:700;font-size:.95em}
+.conf{display:flex;flex-direction:column;gap:.1em}
+.conf h4{margin:0 0 .35em;font-size:.82em;color:var(--a-soft);font-weight:600}
+.conf .r{display:flex;justify-content:space-between;gap:.6em;padding:.42em 0;border-top:1px solid var(--a-line);font-size:.92em}
+.conf .r span{color:var(--a-soft)}
+.conf .r b{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.acts{display:grid;grid-template-columns:1fr 1.3fr;gap:.5em;margin-top:.55em;font-size:.9em;font-weight:700;text-align:center}
+.acts span{padding:.65em;border-radius:99px;background:var(--a-card2)}
+.acts span+span{background:var(--mac);color:#fff}
+.tips{font-size:.78em;color:var(--a-soft);padding:0 .2em}
+/* PIN */
+.pin{align-items:center;text-align:center;justify-content:flex-start;gap:1em}
+.pin .dots{display:flex;gap:.9em;margin:.4em 0 .6em}
+.pin .dots i{width:1em;height:1em;border-radius:50%;border:1.5px solid var(--a-soft)}
+.pin .dots i.f{background:var(--mac2);border-color:var(--mac2)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:.8em;width:82%;margin-top:auto;margin-bottom:.6em}
+.keys span{aspect-ratio:1;display:grid;place-items:center;border-radius:50%;background:var(--a-card);font-size:1.4em;font-weight:600}
+.keys span.z{background:none}
+.pin img{width:3.6em;height:3.6em;border-radius:50%;margin-top:1.2em}
+.pin h5{margin:0;font-size:1.05em;font-weight:700}
+.pin p{margin:0;font-size:.8em;color:var(--a-soft)}
+
+@media(max-width:640px){.sec{padding:78px 0}.head{margin-bottom:40px}.hero{padding-bottom:72px}.stage{min-height:460px}.ledger{padding:24px 20px}.ledger .fijo b{font-size:20px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.emblem{animation:none}.in,.stage{animation:none;opacity:1;transform:none}.btn,.gal .frame,.sw{transition:none}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+<symbol id="i-sav" viewBox="0 0 24 24"><path d="M12 3v18M16.5 7.5c-.8-1.3-2.5-2-4.5-2-2.4 0-4.2 1.1-4.2 2.9S9.4 11 12 11.5s4.2 1.2 4.2 3.1-1.8 3-4.2 3c-2.1 0-3.9-.8-4.8-2.2"/></symbol>
+<symbol id="i-grp" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14.2c2.4.3 4 2.2 4 4.8"/></symbol>
+<symbol id="i-rep" viewBox="0 0 24 24"><path d="M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="i-spk" viewBox="0 0 24 24"><path d="M11 3l1.9 5.6L18.5 10.5 12.9 12.4 11 18l-1.9-5.6L3.5 10.5 9.1 8.6zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+</defs></svg>
+
+<header class="top" id="top"><div class="w"><nav class="nav">
+<a class="brand" href="#" aria-label="Aurora Presupuesto"><img alt="" src="assets/logo.png" width="38" height="38"><span>AURORA PRESUPUESTO</span></a>
+<div class="links"><a href="#pantallas">Pantallas</a><a href="#funciones">Funciones</a><a href="#preguntas">Preguntas</a><a class="pill" href="#descargar">Descargar</a></div>
+</nav></div></header>
+
+<div class="hero-bg"><div class="w">
+<div class="hero">
+<div>
+<div class="in"><span class="eyebrow"><i></i>Hecha en Venezuela · Funciona sin internet</span></div>
+<h1 class="in">Tu plata, en bolívares y dólares, <b>bajo control.</b></h1>
+<p class="lead in">Registra gastos en segundos, sigue tus cuentas, deudas y metas, y mira cuánto puedes gastar hoy. Cada movimiento guarda la tasa del día.</p>
+<div class="btns in"><a class="btn" href="#descargar">Descargar para Android</a><a class="btn o" href="#pantallas">Ver las pantallas</a></div>
+<ul class="pills in">
+<li><svg viewBox="0 0 24 24"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><path d="M3 3l18 18"/></svg>Sin internet para el uso diario</li>
+<li><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Tus datos, en tu teléfono</li>
+<li><svg viewBox="0 0 24 24"><path d="M12 21s7-5.6 7-11a7 7 0 0 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Tasa BCV, paralelo o manual</li>
+</ul>
+</div>
+<div class="stage"><img class="emblem" alt="" src="assets/logo.png" width="520" height="520">
+<div>
+<div class="frame"><div class="scr" role="img" aria-label="Pantalla de inicio de Aurora Presupuesto con la dona de gastos, saldo del mes y el monto que puedes gastar hoy">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ah"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Aurora</b>
+<div class="tg" role="group" aria-label="Moneda de la vista"><button class="on" data-cur="USD" type="button">$</button><button data-cur="BS" type="button">Bs</button></div></div>
+<div class="per"><span>Día</span><span>Semana</span><span class="on">Mes</span><span>Año</span><span>Todo</span></div>
+<div class="donut"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" stroke="#212832"/>
+<circle cx="60" cy="60" r="40" stroke="#38BDF8" stroke-dasharray="94 157.3" stroke-dashoffset="0"/>
+<circle cx="60" cy="60" r="40" stroke="#F2B544" stroke-dasharray="53.8 197.5" stroke-dashoffset="-95.5"/>
+<circle cx="60" cy="60" r="40" stroke="#EF5350" stroke-dasharray="43.7 207.6" stroke-dashoffset="-150.8"/>
+<circle cx="60" cy="60" r="40" stroke="#25B567" stroke-dasharray="28.7 222.6" stroke-dashoffset="-196"/>
+<circle cx="60" cy="60" r="40" stroke="#8B5CF6" stroke-dasharray="23.6 227.7" stroke-dashoffset="-226.2"/></svg>
+<div><small>Saldo del mes</small><b class="m" data-usd="412.6">$ 412,60</b></div></div>
+<div class="leg"><span style="--c:#38BDF8">Comida<em>38%</em></span><span style="--c:#F2B544">Transporte<em>22%</em></span><span style="--c:#EF5350">Servicios<em>18%</em></span><span style="--c:#25B567">Salud<em>12%</em></span><span style="--c:#8B5CF6">Otros<em>10%</em></span></div>
+<div class="two"><div class="cd"><small>Ingresos</small><b class="pos m" data-usd="620">$ 620,00</b></div><div class="cd"><small>Gastos</small><b class="neg m" data-usd="207.4">$ 207,40</b></div></div>
+<div class="cd disp"><div class="t"><svg viewBox="0 0 24 24"><use href="#i-sav"/></svg>Puedo gastar hoy</div><b class="m" data-usd="9.8">$ 9,80</b><small>Libre para 20 día(s) · ya apartados <span class="m" data-usd="114">$ 114,00</span></small></div>
+<div class="dock"><div class="p4"><svg viewBox="0 0 24 24"><use href="#i-sav"/></svg><svg viewBox="0 0 24 24"><use href="#i-grp"/></svg><svg viewBox="0 0 24 24"><use href="#i-rep"/></svg><svg viewBox="0 0 24 24"><use href="#i-spk"/></svg></div><div class="nuevo"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg>Nuevo</div></div>
+</div></div>
+</div></div>
+</div>
+</div></div>
+
+<section id="pantallas" class="sec"><div class="w center head" style="margin-bottom:34px"><h2>Conoce la app <b>por dentro</b></h2><p class="sub">Las pantallas de Aurora Presupuesto, con datos de ejemplo. Toca un color y mira cómo cambian.</p></div>
+<div class="gal">
+<div class="cap"><div class="frame"><div class="scr" role="img" aria-label="Pantalla de presupuestos por categoría">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ph"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Presupuestos</b></div>
+<div class="two"><div class="cd"><small>Presupuestado</small><b>$ 315,00</b></div><div class="cd"><small>Gastado</small><b class="amb">$ 217,83</b></div></div>
+<div class="cd it"><div class="r"><span>Comida</span><b>$ 78,81 <small>de 120</small></b></div><div class="bar"><i style="--p:66%"></i></div></div>
+<div class="cd it"><div class="r"><span>Transporte</span><b>$ 45,63 <small>de 50</small></b></div><div class="bar bw"><i style="--p:91%"></i></div></div>
+<div class="cd it"><div class="r"><span>Servicios</span><b>$ 37,33 <small>de 90</small></b></div><div class="bar"><i style="--p:41%"></i></div></div>
+<div class="cd it"><div class="r"><span>Salud</span><b>$ 24,89 <small>de 30</small></b></div><div class="bar bw"><i style="--p:83%"></i></div></div>
+<div class="cd it"><div class="r"><span>Ocio</span><b class="neg">$ 31,00 <small>de 25</small></b></div><div class="bar br"><i style="--p:100%"></i></div></div>
+<div class="fab"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg>Nuevo presupuesto</div>
+</div></div><p>Presupuestos por categoría</p></div>
+<div class="cap"><div class="frame"><div class="scr" role="img" aria-label="Pantalla de clientes y deudas">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ph"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Clientes y deudas</b></div>
+<div class="tabs"><span class="on">Clientes</span><span>Deudas</span></div>
+<div class="cd"><small>Te deben en total</small><b class="amb" style="font-size:1.5em">$ 66,50</b></div>
+<div class="cd cli"><div class="top2"><b>Carmen R.</b><b class="amb">$ 18,00</b></div><small>Fiado desde el 3 de nov.</small><span class="wa-b">Cobrar por WhatsApp</span></div>
+<div class="cd cli"><div class="top2"><b>Bodega Los Mangos</b><b class="amb">$ 42,50</b></div><small>Fiado desde el 28 de oct.</small><span class="wa-b">Cobrar por WhatsApp</span></div>
+<div class="cd cli"><div class="top2"><b>Luis M.</b><b class="amb">$ 6,00</b></div><small>Abonó $ 4,00 el 12 de nov.</small><span class="wa-b">Cobrar por WhatsApp</span></div>
+<div class="fab"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg>Nuevo cliente</div>
+</div></div><p>Fiados y abonos por cliente</p></div>
+<div class="cap"><div class="frame"><div class="scr" role="img" aria-label="Pantalla de reportes con comparación de meses en dólares">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ph"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Reportes y exportar</b></div>
+<div class="cd"><small>Gastos por mes, en dólares</small>
+<div class="cols"><div style="--h:100%"><em>540</em><i style="--h:100%"></i>Ago</div><div><em>468</em><i style="--h:87%"></i>Sep</div><div><em>392</em><i style="--h:73%"></i>Oct</div><div class="cur"><em>207</em><i style="--h:38%"></i>Nov</div></div></div>
+<div class="cd"><small>Gastos hormiga del mes</small><b class="amb" style="font-size:1.3em">$ 23,40</b><small style="margin-top:.3em">Café, golosinas y pasajes sueltos. Son 14 gastos pequeños.</small></div>
+<div class="cd"><small>Exportar</small><div class="btn2" style="margin-top:.6em"><span>Excel</span><span>CSV</span><span>PDF</span></div></div>
+<div class="cd"><small>Comprobante</small><b style="font-size:.92em;display:block;margin-top:.2em">PDF de cualquier movimiento</b></div>
+</div></div><p>Reportes y exportar</p></div>
+<div class="cap"><div class="frame"><div class="scr" role="img" aria-label="Pantalla de metas de ahorro en dólares">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ph"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Metas de ahorro</b></div>
+<div class="cd it"><div class="r"><span>Fondo de emergencia</span><b>42%</b></div><div class="bar"><i style="--p:42%"></i></div><div class="r"><small>$ 210,00 de $ 500,00</small></div></div>
+<div class="cd it"><div class="r"><span>Viaje a Mérida</span><b>34%</b></div><div class="bar"><i style="--p:34%"></i></div><div class="r"><small>$ 85,00 de $ 250,00</small></div></div>
+<div class="cd it"><div class="r"><span>Repuesto de la moto</span><b class="pos">Lograda</b></div><div class="bar"><i style="--p:100%"></i></div><div class="r"><small>$ 140,00 de $ 140,00</small></div></div>
+<div class="cd"><small>Pagos recurrentes · próximos 7 días</small>
+<div class="r" style="display:flex;justify-content:space-between;margin-top:.5em;font-size:.88em"><span>Mié 19 · Internet</span><b class="amb">$ 18,00</b></div>
+<div class="r" style="display:flex;justify-content:space-between;margin-top:.3em;font-size:.88em"><span>Vie 21 · Alquiler</span><b class="amb">$ 56,00</b></div></div>
+<div class="fab"><svg viewBox="0 0 24 24"><use href="#i-plus"/></svg>Nueva meta</div>
+</div></div><p>Metas en dólares y pagos recurrentes</p></div>
+</div>
+<div class="w"><div class="swatch-row" id="sws" role="group" aria-label="Color de acento"><span>Elige tu color</span></div>
+<p class="note center" style="text-align:center;margin-top:20px">Datos de ejemplo. Cada color tiene versión clara y oscura, y la app incluye modo claro.</p></div></section>
+
+<section id="tasa" class="sec alt"><div class="w split">
+<div><h2>El dólar se mueve. <b>Tus gastos no.</b></h2><p class="sub">Cada movimiento guarda su propia tasa y sus equivalentes en bolívares y dólares ya calculados. Cuando el dólar sube, tus reportes viejos siguen diciendo lo que valía tu gasto ese día.</p>
+<ul class="ok">
+<li><b>Tasa del BCV</b> por defecto, o elige Paralelo, o escribe una tasa Manual.</li>
+<li><b>Cuentas en Bs y en $</b>, y transferencias entre ellas sin contarlas como gasto.</li>
+<li><b>Sin internet</b> usa la última tasa guardada.</li>
+</ul></div>
+<div class="ledger" role="img" aria-label="Ejemplo: un gasto de 10 dólares guardado con la tasa del día vale 485 bolívares aunque hoy el dólar esté más alto">
+<div class="tit"><span>GASTO · 3 DE NOVIEMBRE</span><div class="chips"><i class="on">BCV</i><i>Paralelo</i><i>Manual</i></div></div>
+<div class="row"><span>Mercado</span><b>$ 10,00</b></div>
+<div class="row"><span>Tasa guardada ese día</span><b>Bs 48,50</b></div>
+<div class="row"><span>Dólar hoy (ejemplo)</span><b>Bs 52,00</b></div>
+<div class="row"><span>Recalculado con la tasa de hoy</span><b><s>Bs 520,00</s></b></div>
+<div class="fijo"><small>Lo que muestra tu reporte,<br>el valor real de ese día</small><b>Bs 485,00</b></div>
+</div>
+</div></section>
+
+<section id="asistente" class="sec"><div class="w split rev">
+<div><h2>Escríbelo <b>como lo dirías</b></h2><p class="sub">Escribe qué pasó y el asistente arma el movimiento. Tú revisas y confirmas. Toca un ejemplo.</p>
+<div class="btns" id="chips" style="margin:28px 0 8px;gap:10px"></div>
+<ul class="ok">
+<li><b>Todo corre en tu teléfono.</b> No hay IA remota ni se envía nada a internet.</li>
+<li><b>Nada se guarda sin tu confirmación.</b> Ninguna orden mueve dinero sola.</li>
+</ul></div>
+<div><div class="frame"><div class="scr" role="img" aria-label="Asistente: escribes un gasto y la app muestra lo que entendió para que lo confirmes">
+<div class="sb"><span>9:41</span><i></i></div>
+<div class="ph"><svg viewBox="0 0 24 24"><use href="#i-menu"/></svg><b>Asistente</b></div>
+<div class="inp" id="asiTxt">gasté 500 bs en el mercado</div>
+<div class="go">Entender</div>
+<div class="cd conf"><h4>Esto es lo que entendí</h4>
+<div class="r"><span>Tipo</span><b id="aTipo">Gasto</b></div>
+<div class="r"><span>Monto</span><b id="aMonto">Bs 500,00</b></div>
+<div class="r"><span>Categoría</span><b id="aCat">Comida</b></div>
+<div class="r"><span>Cuenta</span><b id="aCta">Efectivo Bs</b></div>
+<div class="r"><span>Fecha</span><b id="aFec">Hoy</b></div>
+<div class="acts"><span>Cancelar</span><span>Confirmar</span></div></div>
+<p class="tips" style="margin-top:auto">Ejemplos: «pagué 20$ de luz con zelle», «cobré 3.000 bs de sueldo».</p>
+</div></div><p class="note" style="text-align:center;margin-top:18px">Pantalla de ejemplo con datos ficticios.</p></div>
+</div></section>
+
+<section class="sec alt"><div class="w"><div class="center head"><h2>¿Cuánto puedo gastar <b>hoy?</b></h2><p class="sub">Aurora descuenta lo que ya está comprometido y reparte el resto entre los días que faltan.</p></div>
+<div class="calc" role="img" aria-label="Ejemplo: 310 dólares disponibles, menos 74 de pagos que faltan, menos 40 de deudas, entre 20 días, da 9,80 dólares por día">
+<div class="tile"><small>Efectivo disponible</small><b>$ 310,00</b></div>
+<div class="tile"><small>Pagos recurrentes que faltan</small><b>− $ 74,00</b></div>
+<div class="tile"><small>Lo que debes</small><b>− $ 40,00</b></div>
+<div class="tile"><small>Días que quedan del período</small><b>÷ 20</b></div>
+<div class="op">=</div>
+<div class="tile res"><small>Puedo gastar hoy</small><b>$ 9,80</b></div>
+</div>
+<p class="calc-note">Cifras de ejemplo. En la app el cálculo se hace solo con tus datos.</p></div></section>
+
+<section id="funciones" class="sec"><div class="w"><div class="center head"><h2>Todo lo que necesitas <b>en un solo lugar</b></h2><p class="sub">Sin cuadernos ni hojas de cálculo.</p></div>
+<div class="feat">
+<div class="cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><h3>Registro rápido</h3><p>Toca «+ Nuevo», escribe el monto y elige la categoría. Cuenta, fecha y nota son opcionales.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 14.5h2"/></svg><h3>Cuentas y bancos</h3><p>Efectivo Bs y $, Pago Móvil, banco, Zelle y Binance, cada una con su saldo.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><use href="#i-sav"/></svg><h3>Presupuestos y metas</h3><p>Límites por categoría y metas de ahorro en dólares que ves avanzar.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><use href="#i-grp"/></svg><h3>Clientes y deudas</h3><p>Fiados ligados al cliente, abonos y cobro por WhatsApp con su número.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><use href="#i-rep"/></svg><h3>Pagos recurrentes</h3><p>Programa alquiler, internet o suscripciones y mira los de los próximos 7 días.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg><h3>Reportes y exportar</h3><p>Gastos hormiga, comparación de meses en dólares, Excel, CSV, PDF y comprobantes.</p></div>
+<div class="cell hot"><svg viewBox="0 0 24 24"><use href="#i-spk"/></svg><h3>Asistente</h3><p>Escribe «gasté 500 bs en el mercado» y confirma lo que entendió. Sin internet.</p></div>
+<div class="cell"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><h3>Respaldo y PIN</h3><p>Respaldo diario, copia cifrada con contraseña, PIN y modo para ocultar saldos.</p></div>
+</div></div></section>
+
+<section id="confianza" class="sec alt"><div class="w split">
+<div><h2>¿Por qué puedes <b>confiar</b>?</h2><p class="sub">Tu plata es tuya y los datos también. Aquí va con transparencia.</p>
+<ul class="ok">
+<li><b>Tus datos viven en tu teléfono,</b> no en nuestros servidores. No hay cuenta.</li>
+<li>La app solo se conecta a internet para pedir las tasas del dólar.</li>
+<li>Los importes son enteros, sin errores de redondeo al sumar.</li>
+<li>Copia de la base antes de actualizar y revisión de integridad al abrir.</li>
+<li>Respaldo cifrado con contraseña y restauración guiada.</li>
+<li>Soporte directo por WhatsApp, sin intermediarios.</li>
+</ul>
+<p class="firma">Aurora Mantenimiento · Carúpano, Estado Sucre.</p></div>
+<div><div class="frame"><div class="scr pin" role="img" aria-label="Pantalla de PIN de Aurora Presupuesto">
+<div class="sb" style="width:100%"><span>9:41</span><i></i></div>
+<img alt="" src="assets/logo.png" width="64" height="64">
+<h5>Aurora Presupuesto</h5><p>Ingresa tu PIN</p>
+<div class="dots"><i class="f"></i><i class="f"></i><i></i><i></i></div>
+<div class="keys"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span class="z"></span><span>0</span><span class="z"></span></div>
+</div></div></div>
+</div></section>
+
+<section class="sec"><div class="w"><div class="center head"><h2>Empieza en <b>3 pasos</b></h2><p class="sub">Sin cuentas ni registros.</p></div>
+<div class="steps">
+<div class="step"><div><b>Descarga el APK</b><span>Desde esta página. Es el archivo oficial.</span></div></div>
+<div class="step"><div><b>Instálalo</b><span>Android te pedirá permitir instalar apps de esta fuente. Es normal mientras llegamos a Play Store.</span></div></div>
+<div class="step"><div><b>Registra tu primer gasto</b><span>Toca «+ Nuevo», escribe el monto, elige la categoría y guarda.</span></div></div>
+</div></div></section>
+
+<section id="preguntas" class="sec alt"><div class="w faq"><div class="center head"><h2>Preguntas <b>frecuentes</b></h2></div>
+<details><summary>¿Qué tasa se usa para el dólar?</summary><p>Por defecto la del BCV. También puedes elegir Paralelo o escribir una tasa Manual al registrar. La tasa se guarda con cada movimiento y no cambia después.</p></details>
+<details><summary>¿Necesito internet?</summary><p>No para el uso diario. La app solo consulta por internet las tasas de cambio, y si no hay conexión usa la última guardada.</p></details>
+<details><summary>¿Mis datos se envían a algún lado?</summary><p>No. Tus movimientos viven solo en tu teléfono.</p></details>
+<details><summary>¿Cómo hago un respaldo?</summary><p>En el menú, entra a Respaldo y toca «Crear respaldo ahora». Esa copia queda dentro de la app y se pierde si la desinstalas, así que guarda otra afuera desde «Reportes y exportar».</p></details>
+<details><summary>Olvidé mi PIN, ¿qué hago?</summary><p>El PIN no se puede recuperar desde la app. Reinstalarla lo quita, pero también borra los datos que no tengan una copia fuera del teléfono.</p></details>
+<details><summary>¿Por qué no está en Play Store?</summary><p>Estamos en proceso de publicarla. Mientras tanto la distribuimos desde esta página oficial.</p></details>
+<details><summary>¿Y si tengo un problema?</summary><p>Escríbeme por WhatsApp y te ayudo directamente.</p></details>
+</div></section>
+
+<section id="descargar" class="sec" style="padding-top:20px"><div class="w"><div class="cta"><img class="logo" alt="" src="assets/logo.png" width="92" height="92"><h2>Descarga <b>Aurora Presupuesto</b></h2><p>Android · Sin cuenta · Funciona sin internet</p>
+<a class="btn" id="dl" href="#descargar">⬇ Descargar APK</a>
+<p class="wa">¿Tienes dudas? <a id="wa" href="#">Escríbeme por WhatsApp</a></p>
+<div id="msg" role="status"></div></div></div></section>
+
+<footer><div class="w">© Aurora Mantenimiento · Carúpano, Venezuela · Programa de la serie Aurora<br>WhatsApp +58 412 0915616</div></footer>
+<script>
+// ====== EDITA SOLO ESTO ======
+// Pega aquí el enlace del APK. Con GitHub Releases:
+// https://github.com/USUARIO/REPO/releases/latest/download/Aurora.Presupuesto.Android.apk
+var APK_URL="";
+var APK_VERSION="";
+// =============================
+var d=document.getElementById("dl"),m=document.getElementById("msg");
+if(APK_URL){d.href=APK_URL;if(APK_VERSION)d.textContent="⬇ Descargar APK "+APK_VERSION}
+else d.addEventListener("click",function(e){e.preventDefault();m.textContent="La descarga estará disponible muy pronto. Escríbeme por WhatsApp y te ayudo."});
+document.getElementById("wa").href="https://wa.me/584120915616?text="+encodeURIComponent("Hola, necesito soporte de Aurora Presupuesto.");
+var tp=document.getElementById("top");
+function sc(){tp.classList.toggle("on",window.scrollY>12)}
+sc();window.addEventListener("scroll",sc,{passive:true});
+
+// formato de dinero como en la app: 1.234,56
+function fmt(n){var p=n.toFixed(2).split("."),i=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,".");return i+","+p[1]}
+var RATE=50; // tasa de ejemplo
+var cur="USD";
+function paint(){document.querySelectorAll(".m").forEach(function(e){var u=parseFloat(e.dataset.usd);e.textContent=cur==="USD"?"$ "+fmt(u):"Bs "+fmt(u*RATE)})}
+document.querySelectorAll(".tg button").forEach(function(b){b.addEventListener("click",function(){
+cur=b.dataset.cur;document.querySelectorAll(".tg button").forEach(function(x){x.classList.toggle("on",x===b)});paint()})});
+
+// colores de acento de la app (marca.py)
+var AC=[["Verde","#1B9E52","#25B567"],["Azul","#2563EB","#3B82F6"],["Morado","#7C3AED","#8B5CF6"],["Naranja","#EA580C","#F97316"],["Turquesa","#0D9488","#14B8A6"],["Vino","#BE123C","#E11D48"],["Rosa","#DB2777","#EC4899"],["Grafito","#475569","#64748B"]];
+var sws=document.getElementById("sws");
+AC.forEach(function(a,i){var b=document.createElement("button");b.type="button";b.className="sw";b.style.setProperty("--c",a[1]);b.title=a[0];b.setAttribute("aria-label",a[0]);b.setAttribute("aria-pressed",i===0);
+b.addEventListener("click",function(){var r=document.documentElement.style;r.setProperty("--mac",a[1]);r.setProperty("--mac2",a[2]);
+sws.querySelectorAll(".sw").forEach(function(x){x.setAttribute("aria-pressed",x===b)})});sws.appendChild(b)});
+
+// asistente: ejemplos del propio asistente de la app
+var EX=[
+["gasté 500 bs en el mercado","Gasto","Bs 500,00","Comida","Efectivo Bs","Hoy"],
+["pagué 20$ de luz con zelle","Gasto","$ 20,00","Servicios","Zelle","Hoy"],
+["cobré 3.000 bs de sueldo","Ingreso","Bs 3.000,00","Sueldo","Banco Bs","Hoy"],
+["compré pan 1,5 dólares ayer","Gasto","$ 1,50","Comida","Efectivo $","Ayer"]];
+var ch=document.getElementById("chips");
+function show(k){var e=EX[k];document.getElementById("asiTxt").textContent=e[0];
+document.getElementById("aTipo").textContent=e[1];document.getElementById("aMonto").textContent=e[2];
+document.getElementById("aCat").textContent=e[3];document.getElementById("aCta").textContent=e[4];document.getElementById("aFec").textContent=e[5];
+ch.querySelectorAll("button").forEach(function(b,j){b.setAttribute("aria-pressed",j===k);b.style.borderColor=j===k?"rgba(47,201,116,.7)":"";b.style.background=j===k?"rgba(47,201,116,.1)":""})}
+EX.forEach(function(e,k){var b=document.createElement("button");b.type="button";b.className="btn o";b.style.cssText="padding:10px 18px;font-size:13.5px;font-weight:500";b.textContent="«"+e[0]+"»";b.addEventListener("click",function(){show(k)});ch.appendChild(b)});
+show(0);
+</script>
+</body></html>
